@@ -1,4 +1,4 @@
-# Contas de Casa
+# EAJ — Contas de Casa
 
 App web (PWA) para lançar e acompanhar as contas da casa, com divisão automática por 3.
 

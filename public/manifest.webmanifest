@@ -1,6 +1,6 @@
 {
-  "name": "Contas de Casa",
-  "short_name": "Contas de Casa",
+  "name": "EAJ",
+  "short_name": "EAJ",
   "description": "Controle e divisão das contas da casa",
   "start_url": "/",
   "display": "standalone",
