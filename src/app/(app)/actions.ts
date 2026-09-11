@@ -6,18 +6,15 @@ import type { ExpenseCategory } from "@/lib/supabase/types";
 
 export async function createExpense(formData: FormData) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Não autenticado");
 
   const description = String(formData.get("description") ?? "").trim();
   const amount = Number(formData.get("amount"));
   const category = String(formData.get("category") ?? "outros") as ExpenseCategory;
   const expenseDate = String(formData.get("expense_date") ?? "");
-  const paidBy = String(formData.get("paid_by") ?? user.id);
+  const paidBy = String(formData.get("paid_by") ?? "");
+  const createdBy = String(formData.get("created_by") ?? paidBy);
 
-  if (!description || !amount || amount <= 0 || !expenseDate) {
+  if (!description || !amount || amount <= 0 || !expenseDate || !paidBy) {
     throw new Error("Preencha todos os campos corretamente");
   }
 
@@ -27,7 +24,7 @@ export async function createExpense(formData: FormData) {
     category,
     expense_date: expenseDate,
     paid_by: paidBy,
-    created_by: user.id,
+    created_by: createdBy || null,
   });
 
   if (error) throw new Error(error.message);

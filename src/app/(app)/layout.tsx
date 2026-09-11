@@ -1,27 +1,11 @@
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import Header from "@/components/Header";
-import BottomNav from "@/components/BottomNav";
+import AppShell from "@/components/AppShell";
+
+export const dynamic = "force-dynamic";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: profiles } = await supabase.from("profiles").select("*").order("created_at");
 
-  if (!user) redirect("/login");
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("name")
-    .eq("id", user.id)
-    .single();
-
-  return (
-    <div className="flex min-h-screen flex-1 flex-col">
-      <Header name={profile?.name ?? "morador"} />
-      <main className="mx-auto w-full max-w-md flex-1 px-4 py-5">{children}</main>
-      <BottomNav />
-    </div>
-  );
+  return <AppShell profiles={profiles ?? []}>{children}</AppShell>;
 }

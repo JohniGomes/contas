@@ -20,10 +20,10 @@ export default function DeleteExpenseButton({ id }: { id: string }) {
     <button
       onClick={handleClick}
       disabled={isPending}
-      className="text-slate-300 hover:text-red-500 disabled:opacity-50"
+      className="text-xs font-medium text-slate-400 hover:text-red-500 disabled:opacity-50"
       aria-label="Excluir"
     >
-      ✕
+      Excluir
     </button>
   );
 }

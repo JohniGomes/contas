@@ -2,11 +2,14 @@
 
 App web (PWA) para lançar e acompanhar as contas da casa, com divisão automática por 3.
 
-Stack: **Next.js** (App Router) + **Supabase** (auth + banco) + **Vercel** (deploy).
+Stack: **Next.js** (App Router) + **Supabase** (banco de dados) + **Vercel** (deploy).
+
+Sem login: qualquer pessoa com o link abre o app, escolhe seu nome numa lista fixa
+de moradores e já pode lançar e ver as contas.
 
 ## Funcionalidades
 
-- Login/cadastro por e-mail e senha (cada morador tem sua conta)
+- Escolha simples de "quem é você" (sem senha), lembrada no aparelho
 - Lançar despesas: descrição, valor, categoria, data e quem pagou
 - Resumo com o saldo de cada pessoa (quem pagou mais/menos que a cota)
 - Sugestão de quem deve pagar quem para acertar as contas
@@ -16,16 +19,20 @@ Stack: **Next.js** (App Router) + **Supabase** (auth + banco) + **Vercel** (depl
 ## Configurar o Supabase
 
 1. Crie um projeto em [supabase.com](https://supabase.com).
-2. No **SQL Editor**, rode o conteúdo de [`supabase/schema.sql`](supabase/schema.sql). Isso cria as tabelas `profiles` e `expenses`, as políticas de RLS e o gatilho que cria o perfil automaticamente ao cadastrar.
-3. Em **Project Settings → API**, copie a **Project URL** e a **anon public key**.
-4. Copie `.env.local.example` para `.env.local` e preencha:
+2. No **SQL Editor**, rode o conteúdo de [`supabase/schema.sql`](supabase/schema.sql). Isso cria as tabelas `profiles` e `expenses` e as políticas de acesso (liberado para quem tiver a chave anônima do projeto).
+3. Ainda no SQL Editor, cadastre os moradores, por exemplo:
+
+   ```sql
+   insert into public.profiles (name) values ('Mãe'), ('Padrasto'), ('Você');
+   ```
+
+4. Em **Project Settings → API**, copie a **Project URL** e a **anon public key**.
+5. Copie `.env.local.example` para `.env.local` e preencha:
 
    ```
    NEXT_PUBLIC_SUPABASE_URL=...
    NEXT_PUBLIC_SUPABASE_ANON_KEY=...
    ```
-
-5. (Opcional) Em **Authentication → Providers → Email**, desative "Confirm email" para facilitar o cadastro das 3 pessoas de casa sem precisar confirmar e-mail.
 
 ## Rodar localmente
 
@@ -34,7 +41,7 @@ npm install
 npm run dev
 ```
 
-Acesse `http://localhost:3000`, cadastre as 3 pessoas (nome + e-mail + senha) e comece a lançar as contas.
+Acesse `http://localhost:3000`, escolha seu nome e comece a lançar as contas.
 
 ## Deploy na Vercel
 
@@ -45,7 +52,13 @@ Acesse `http://localhost:3000`, cadastre as 3 pessoas (nome + e-mail + senha) e 
 
 ## Estrutura
 
-- `supabase/schema.sql` — schema do banco (tabelas, RLS, trigger de perfil)
-- `src/app/(app)` — páginas autenticadas (resumo, lançamentos, novo lançamento)
-- `src/app/login` — login/cadastro
+- `supabase/schema.sql` — schema do banco (tabelas e políticas de acesso)
+- `src/app/(app)` — páginas do app (resumo, lançamentos, novo lançamento)
+- `src/components/AppShell.tsx` — tela de "quem é você" e o layout com navegação
 - `src/lib/split.ts` — cálculo da divisão por 3 e sugestão de acerto de contas
+
+## Observação sobre segurança
+
+Como não há login, qualquer pessoa com o link e a chave anônima consegue ler e
+alterar os lançamentos. Está pensado para uso privado entre as 3 pessoas de
+casa — não compartilhe o link publicamente.

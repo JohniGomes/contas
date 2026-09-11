@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { calculateBalances, calculateSettlements } from "@/lib/split";
-import { categoryEmoji, categoryLabel } from "@/lib/categories";
+import { categoryLabel } from "@/lib/categories";
 
 function formatBRL(value: number) {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -109,9 +109,7 @@ export default async function DashboardPage() {
               .sort((a, b) => b[1] - a[1])
               .map(([cat, value]) => (
                 <div key={cat} className="flex items-center justify-between text-sm">
-                  <span>
-                    {categoryEmoji(cat as never)} {categoryLabel(cat as never)}
-                  </span>
+                  <span>{categoryLabel(cat as never)}</span>
                   <span className="font-medium text-slate-700">{formatBRL(value)}</span>
                 </div>
               ))}

@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createExpense } from "@/app/(app)/actions";
 import { CATEGORIES } from "@/lib/categories";
+import { getStoredProfileId } from "@/lib/current-profile";
 import type { Profile } from "@/lib/supabase/types";
 
 function todayISO() {
@@ -12,19 +13,19 @@ function todayISO() {
   return new Date(d.getTime() - offset * 60000).toISOString().slice(0, 10);
 }
 
-export default function NewExpenseForm({
-  profiles,
-  currentUserId,
-}: {
-  profiles: Profile[];
-  currentUserId: string;
-}) {
+export default function NewExpenseForm({ profiles }: { profiles: Profile[] }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [currentProfileId, setCurrentProfileId] = useState("");
+
+  useEffect(() => {
+    setCurrentProfileId(getStoredProfileId() ?? "");
+  }, []);
 
   function handleSubmit(formData: FormData) {
     setError(null);
+    formData.set("created_by", currentProfileId);
     startTransition(async () => {
       try {
         await createExpense(formData);
@@ -70,7 +71,7 @@ export default function NewExpenseForm({
         >
           {CATEGORIES.map((c) => (
             <option key={c.value} value={c.value}>
-              {c.emoji} {c.label}
+              {c.label}
             </option>
           ))}
         </select>
@@ -91,7 +92,8 @@ export default function NewExpenseForm({
         <label className="block text-sm font-medium text-slate-700">Quem pagou</label>
         <select
           name="paid_by"
-          defaultValue={currentUserId}
+          value={currentProfileId}
+          onChange={(e) => setCurrentProfileId(e.target.value)}
           className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
         >
           {profiles.map((p) => (
