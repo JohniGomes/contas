@@ -11,10 +11,8 @@ export async function createExpense(formData: FormData) {
   const amount = Number(formData.get("amount"));
   const category = String(formData.get("category") ?? "outros") as ExpenseCategory;
   const expenseDate = String(formData.get("expense_date") ?? "");
-  const paidBy = String(formData.get("paid_by") ?? "");
-  const createdBy = String(formData.get("created_by") ?? paidBy);
 
-  if (!description || !amount || amount <= 0 || !expenseDate || !paidBy) {
+  if (!description || !amount || amount <= 0 || !expenseDate) {
     throw new Error("Preencha todos os campos corretamente");
   }
 
@@ -23,8 +21,6 @@ export async function createExpense(formData: FormData) {
     amount,
     category,
     expense_date: expenseDate,
-    paid_by: paidBy,
-    created_by: createdBy || null,
   });
 
   if (error) throw new Error(error.message);

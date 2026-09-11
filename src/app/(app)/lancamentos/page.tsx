@@ -12,13 +12,10 @@ function formatDate(dateStr: string) {
 
 export default async function LancamentosPage() {
   const supabase = await createClient();
-
-  const [{ data: expenses }, { data: profiles }] = await Promise.all([
-    supabase.from("expenses").select("*").order("expense_date", { ascending: false }),
-    supabase.from("profiles").select("*"),
-  ]);
-
-  const profileMap = new Map((profiles ?? []).map((p) => [p.id, p.name]));
+  const { data: expenses } = await supabase
+    .from("expenses")
+    .select("*")
+    .order("expense_date", { ascending: false });
 
   return (
     <div className="space-y-3">
@@ -34,13 +31,12 @@ export default async function LancamentosPage() {
         {(expenses ?? []).map((e) => (
           <div
             key={e.id}
-            className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3"
+            className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm"
           >
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium text-slate-900">{e.description}</p>
               <p className="text-xs text-slate-500">
-                {categoryLabel(e.category)} · {formatDate(e.expense_date)} · pago por{" "}
-                {profileMap.get(e.paid_by) ?? "?"}
+                {categoryLabel(e.category)} · {formatDate(e.expense_date)}
               </p>
             </div>
             <span className="whitespace-nowrap font-semibold text-slate-900">

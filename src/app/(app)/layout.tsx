@@ -1,11 +1,14 @@
-import { createClient } from "@/lib/supabase/server";
-import AppShell from "@/components/AppShell";
+import Header from "@/components/Header";
+import BottomNav from "@/components/BottomNav";
 
 export const dynamic = "force-dynamic";
 
-export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  const supabase = await createClient();
-  const { data: profiles } = await supabase.from("profiles").select("*").order("created_at");
-
-  return <AppShell profiles={profiles ?? []}>{children}</AppShell>;
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex min-h-screen flex-1 flex-col">
+      <Header />
+      <main className="mx-auto w-full max-w-md flex-1 px-4 py-5">{children}</main>
+      <BottomNav />
+    </div>
+  );
 }
